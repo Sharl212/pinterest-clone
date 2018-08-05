@@ -7,7 +7,7 @@ module.exports = {
         fetch('/register',{
             method:'POST',
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "application/json"
             },
             body :JSON.stringify({
                 username,

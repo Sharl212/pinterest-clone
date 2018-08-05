@@ -4,7 +4,7 @@ const express = require('express'),
   env = process.env,
   app = express(),
   {passport, JwtStrategy} = require('./public/modules'),
-  {JWT_OPTIONS, FindByEmail} = require('./public/authenticate')
+  {JWT_OPTIONS, FindByEmail, authenticate} = require('./public/authenticate')
 
 global.App = {
   app,
@@ -26,7 +26,7 @@ global.App = {
   }
 }
 
-global.database = {
+global.database = { // connect to database
   mongoose: require('mongoose'),
   database_credentials: {
     username: 'admin',
@@ -54,7 +54,10 @@ passport.use(new JwtStrategy(JWT_OPTIONS, async (jwt_payload, done) => FindByEma
 // auth routes
 app.post('/register', register_route)
 app.post('/login', login_route)
-// app.post('/auth', passport.authenticate('github'), (req,res)=> res.status(200).send(req.code))
+
+app.get('/auth', authenticate, (req,res)=>{
+  res.status(200).send('authorized')
+})
 
 App.start() // starts the server
 database.start() // connect to the MongoDB database

@@ -3,20 +3,15 @@ const {JWT_CONFIG} = require('./user/global_modules'),
       SchemaModel = require('./user/userschema')
 
 const FindByEmail = (jwt_payload, done) => {
-    console.log(jwt_payload)
+    const ID = jwt_payload._id
 
-    SchemaModel.findById
-    try {
-      db.query(sql_query, (err, res) => {
-        const results = res.recordset
-
-        if (err || results.length < 1) return done(err, false)
-        return done(null, results[0].ID)
-      })
-    } catch (err) {return done(err, false) }
+    SchemaModel.findById(ID, (error, result)=>{
+      if(error) return done(error, false)
+      done(null, result.email)
+    })
   },
 
-  cookieExtractor = (req) => req.cookies['jWtToken']
+  cookieExtractor = (req) => req.cookies['authorizationToken']
 
 JWT_OPTIONS = {
   jwtFromRequest: cookieExtractor,

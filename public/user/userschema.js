@@ -1,4 +1,5 @@
-const {md, JWT_CONFIG} = require('./global_modules'),
+const { md, JWT_CONFIG } = require('./global_modules'),
+  bcrypt = md.bcrypt,
   access = JWT_CONFIG.JWT_SECRET, // private key
   salt = JWT_CONFIG.JWT_SALT
 
@@ -10,7 +11,7 @@ const UserSchema = new md.mongoose.Schema({
     required: true,
     unique: true
   },
-  email:{
+  email: {
     type: String,
     required: true,
     unique: true
@@ -36,13 +37,13 @@ const UserSchema = new md.mongoose.Schema({
 UserSchema.methods.toJSON = function () {
   const userObject = this.toObject()
 
-  return _.pick(userObject, ['_id', 'username', 'email','password'])
+  return _.pick(userObject, ['_id', 'username', 'email'])
 }
 
 UserSchema.methods.generateAuthToken = function () {
-  let token = md.jwt.sign({ _id: this._id.toHexString(), access}, salt).toString()
+  let token = md.jwt.sign({ _id: this._id.toHexString(), access }, salt).toString()
 
-  this.tokens.push({ access, token})
+  this.tokens.push({ access, token })
   return this.save().then(() => token)
 }
 
@@ -62,15 +63,34 @@ UserSchema.statics.findByToken = function (token) {
   })
 }
 
-UserSchema.statics.findByCredentials = function (username, password) {}
+UserSchema.statics.findByCredentials = function (email, PLAIN_PASSWORD) {
+  return (
+    this.findOne({ email }).then((user) => {
+      console.log(user)
+
+      if (!user) {
+        return Promise.reject() // if the user not found, reject the request
+      }
+      const HASHED_PASSWORD = user.password // password stored in DB
+
+      return new Promise(function (resolve, reject) {
+        bcrypt.compare(PLAIN_PASSWORD, HASHED_PASSWORD , function (err, result) {
+          console.log(result)
+          if (result) {
+            resolve(user) // no errors, allow access
+          }
+          reject() // deny the request
+        })
+      })
+    })
+  )
+}
 
 UserSchema.pre('save', function (next) {
-  let user = this
-
-  md.bcrypt.hash(user.password, 10, function (err, hash) {  // hashes the plain text password 
+  bcrypt.hash(this.password, 9, function (err, hash) {  // hashes the plain text password 
     if (err) return console.log(err)
-
-    user.password = hash // replace the plain text password with its hash
+    console.log('hash',hash)
+    this.password = hash // replace the plain text password with its hash
     next() // continue the saving proccess
   })
 })

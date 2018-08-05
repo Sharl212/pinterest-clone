@@ -1,15 +1,19 @@
 const SchemaModel = require('./userschema')
 
-const register_route = async (req, res) => { // register with username, password
-  console.log(req.body)
-  const newAccount = new SchemaModel({
-    username: req.body.username,
-    email: req.body.email,
-    password: req.body.password
-  })
+const register_route = (req, res) => { // register with username, password
+  // console.log(req.body)
+  const username = req.body.username,
+    email = req.body.email,
+    password = req.body.password,
+    newAccount = new SchemaModel({
+      username,
+      email,
+      password
+    })
 
-await newAccount.save().then((data) => {
-  return newAccount.generateAuthToken()
+  newAccount.save().then(async (data) => {
+    console.log(data)
+    return await newAccount.generateAuthToken()
   }).then((token) => {
     res.cookie('authorizationToken', token).status(200).send()
     console.log('account created successfully')
