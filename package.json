@@ -1,0 +1,23 @@
+{
+  "name": "pinterest-clone",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node ./app.js"
+  },
+  "dependencies": {
+    "bcrypt": "^3.0.0",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.16.0",
+    "http-errors": "~1.6.2",
+    "jade": "~1.11.0",
+    "jsonwebtoken": "^8.3.0",
+    "mongodb": "^3.1.1",
+    "mongoose": "^5.2.6",
+    "morgan": "~1.9.0",
+    "passport": "^0.4.0",
+    "passport-github": "^1.1.0",
+    "passport-jwt": "^4.0.0"
+  }
+}
